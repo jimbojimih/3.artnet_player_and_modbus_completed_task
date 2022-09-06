@@ -7,8 +7,10 @@ with socket.socket() as s:
     conn, addr = s.accept()
     with conn:
         print('Connected by', addr)
+        
         while True:
             data = conn.recv(530)
+            print(data[14])
             if not data:
                 break
             
