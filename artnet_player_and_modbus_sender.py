@@ -32,7 +32,8 @@ class artnet_and_modbus_sender():
         self.sleep1 = sleep1
         self.sleep2 = sleep2
         self.file = file
-        self.m = modbus_sender(host  = '192.168.0.10', port = 8234) #modbus
+        #self.m = modbus_sender(host  = '192.168.0.10', port = 8234) #modbus
+        self.m = modbus_sender()
         self.m.connect()
     def connect(self):
         self.s1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -65,6 +66,7 @@ class artnet_and_modbus_sender():
             time.sleep(self.sleep2)   
 
 if __name__ == '__main__':
-    a = artnet_and_modbus_sender(host1 = '192.168.0.1', host2 = '192.168.0.2',
-                                 port = 6454)
+    #a = artnet_and_modbus_sender(host1 = '192.168.0.1', host2 = '192.168.0.2',
+    #                             port = 6454)
+    a = artnet_and_modbus_sender(host2 = '127.0.0.2')
     a.main_loop()
