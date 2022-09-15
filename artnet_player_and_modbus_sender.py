@@ -1,30 +1,46 @@
 import socket 
 import time
+from abc import ABC, abstractmethod
 from pymodbus.client.sync import ModbusTcpClient
 
-class modbus_sender():
-    '''передача данных на modbus устройство'''
-    def __init__(self, host = 'localhost', port = 502, unit = 0x21,
-                 relay_output1 = 0x0000, relay_output2 = 0x0001):
+class ModbusBroadcast():    
+    #self, unit=0x21, relay_output1=0x0000, relay_output2=0x0001
+    def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.unit = unit
-        self.relay_output1 = relay_output1
-        self.relay_output2 = relay_output2
-    def connect(self):
-        self.client = ModbusTcpClient(self.host, port = self.port)
-        self.client.connect()
-    def write_coil_false(self):
-        self.client.write_coil(self.relay_output1, 0, unit = self.unit)
-        self.client.write_coil(self.relay_output2, 0, unit = self.unit)
-    def write_coil_true(self):
-        self.client.write_coil(self.relay_output1, 1, unit = self.unit) 
-        self.client.write_coil(self.relay_output2, 1, unit = self.unit)
+        self.outputs = []
+        self.units = []    
         
-class artnet_and_modbus_sender():
-    '''отправка пакетов на DMX конвертеры'''
-    def __init__(self, host1 = "localhost", host2 = "10.1.3.28", port = 6454,
-                 range_ = 5, sleep1 = .025, sleep2 = 5, file = 'Test_Color.ani'):
+    def connect(self):
+        self.client = ModbusTcpClient(self.host, self.port)
+        self.client.connect()
+        
+    def set_broadcast_settings(self, outputs, modules):
+        self.outputs = outputs
+        self.modules = modules
+        
+    def write_coil_false(self):
+        for module in self.modules:
+            for output in self.outputs:
+                self.client.write_coil(output, 0, unit=module)
+                self.client.write_coil(output, 0, unit=module)
+        
+    def write_coil_true(self):
+        for module in self.modules:
+            for output in self.outputs:
+                self.client.write_coil(output, 1, unit=module)
+                self.client.write_coil(output, 1, unit=module)
+
+a = ModbusBroadcast('localhost', 502)
+a.connect()
+outputs = [0x0000, 0x0001]
+modules = [0x21]
+a.set_broadcast_settings(outputs, modules)
+a.write_coil_false()
+'''        
+class ArtnetAndModbusSender():
+    def __init__(self, host1="localhost", host2="127.0.0.2", port=6454,
+                 range_=5, sleep1=.025, sleep2=5, file='Test_Color.ani'):
         self.host1 = host1
         self.host2 = host2
         self.port = port
@@ -32,7 +48,7 @@ class artnet_and_modbus_sender():
         self.sleep1 = sleep1
         self.sleep2 = sleep2
         self.file = file
-        #self.m = modbus_sender(host  = '192.168.0.10', port = 8234) #modbus
+        #self.m = modbus_sender(host='192.168.0.10', port=8234) #modbus
         self.m = modbus_sender()
         self.m.connect()
     def connect(self):
@@ -66,7 +82,8 @@ class artnet_and_modbus_sender():
             time.sleep(self.sleep2)   
 
 if __name__ == '__main__':
-    #a = artnet_and_modbus_sender(host1 = '192.168.0.1', host2 = '192.168.0.2',
-    #                             port = 6454)
-    a = artnet_and_modbus_sender(host2 = '127.0.0.2')
+    #a = artnet_and_modbus_sender(host1='192.168.0.1', host2='192.168.0.2',
+    #                             port=6454)
+    a = artnet_and_modbus_sender(host2='127.0.0.2')
     a.main_loop()
+'''
