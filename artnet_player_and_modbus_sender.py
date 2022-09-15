@@ -1,10 +1,10 @@
 import socket 
 import time
-from abc import ABC, abstractmethod
+from threading import Thread
 from pymodbus.client.sync import ModbusTcpClient
 
 class ModbusBroadcast():    
-    #self, unit=0x21, relay_output1=0x0000, relay_output2=0x0001
+    
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -31,59 +31,67 @@ class ModbusBroadcast():
                 self.client.write_coil(output, 1, unit=module)
                 self.client.write_coil(output, 1, unit=module)
 
-a = ModbusBroadcast('localhost', 502)
-a.connect()
-outputs = [0x0000, 0x0001]
-modules = [0x21]
-a.set_broadcast_settings(outputs, modules)
-a.write_coil_false()
-'''        
-class ArtnetAndModbusSender():
-    def __init__(self, host1="localhost", host2="127.0.0.2", port=6454,
-                 range_=5, sleep1=.025, sleep2=5, file='Test_Color.ani'):
-        self.host1 = host1
-        self.host2 = host2
-        self.port = port
-        self.range_ = range_
-        self.sleep1 = sleep1
-        self.sleep2 = sleep2
-        self.file = file
-        #self.m = modbus_sender(host='192.168.0.10', port=8234) #modbus
-        self.m = modbus_sender()
-        self.m.connect()
+                
+class ArtnetBroadcast():
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port    
+        
     def connect(self):
-        self.s1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s1.connect((self.host1, self.port))
-        self.s2.connect((self.host2, self.port))
-    def open_packages(self):
-        with open('Test_Color.ani', mode='rb') as f: 
-            self.packages = f.read() 
-    def main_loop(self):
-        self.connect()
-        self.open_packages()
-        for i in range(self.range_):
-            i = 0 #index low
-            x = 530 #index hight
-            self.m.write_coil_true() #send modbus on
-            while x <= len(self.packages):
-                self.package = self.packages[i:x]
-                i += 530
-                x += 530            
-                self.byte_14 = self.package[14]
-                if self.byte_14 == 1:
-                    self.s1.sendall(self.package)                       
-                else:
-                    self.s2.sendall(self.package)
-                #time.sleep(self.sleep1)
-                if x > 20000000:
-                    print(x)
-            self.m.write_coil_false() #send modbus off
-            time.sleep(self.sleep2)   
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect((self.host, self.port))
+
+    def send(self, package):
+        self.package = package
+        self.s.sendall(self.package)
+        
+        
+class Packages():
+    def __init__(self, packages_file):
+        self.packages_file = packages_file
+        self.packages = b''
+        
+    def open(self):
+        with open(self.packages_file, mode='rb') as f: 
+            self.packages = f.read()
+            
+    def get_file(self):
+        return self.packages
+    
 
 if __name__ == '__main__':
-    #a = artnet_and_modbus_sender(host1='192.168.0.1', host2='192.168.0.2',
-    #                             port=6454)
-    a = artnet_and_modbus_sender(host2='127.0.0.2')
-    a.main_loop()
-'''
+    
+    modbus_broadcast = ModbusBroadcast('localhost', 502)
+    modbus_broadcast.connect()
+    outputs = [0x0000, 0x0001]
+    modules = [0x21]
+    modbus_broadcast.set_broadcast_settings(outputs, modules)
+    
+    packages = Packages('Test_Color.ani')
+    packages.open()
+    bytes_string = packages.get_file()
+    
+    art1 = ArtnetBroadcast("127.0.0.1", 6454)
+    art_other = ArtnetBroadcast("127.0.0.2", 6454)
+    art1.connect()
+    art_other.connect()
+    for i in range(5):
+            index_low = 0 
+            index_hight = 530 
+            modbus_broadcast.write_coil_true() 
+            while index_hight <= len(bytes_string):
+                package = bytes_string[index_low:index_hight]
+                index_low += 530
+                index_hight += 530            
+                byte_14 = package[14]
+                if byte_14 == 1:
+                    art1.send(package)                       
+                else:
+                    art_other.send(package)
+                #time.sleep(.025)
+                if index_hight > 20000000:
+                    print(index_hight)
+            modbus_broadcast.write_coil_false() 
+            time.sleep(5)
+
+
