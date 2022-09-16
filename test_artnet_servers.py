@@ -10,7 +10,6 @@ def run(host, port):
         with conn:
             while True:
                 data = conn.recv(4096)
-                print(data[14])
 
 for host in ['127.0.0.1', '127.0.0.2']:
     for port in [6454]:
