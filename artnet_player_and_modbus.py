@@ -3,13 +3,12 @@ import time
 
 from pymodbus.client.sync import ModbusTcpClient
 
-class ModbusBroadcast():    
-    
+class ModbusBroadcast():       
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.outputs = []
-        self.units = []    
+        self.modules = []    
         
     def connect(self):
         self.client = ModbusTcpClient(self.host, self.port)
@@ -32,8 +31,7 @@ class ModbusBroadcast():
                 self.client.write_coil(output, 1, unit=module)
 
                 
-class ArtnetBroadcast():
-    
+class ArtnetBroadcast():    
     def __init__(self, host, port):
         self.host = host
         self.port = port    
@@ -47,8 +45,7 @@ class ArtnetBroadcast():
         self.s.sendall(self.package)
         
         
-class Packages():
-    
+class Packages():    
     def __init__(self, packages_file):
         self.packages_file = packages_file
         self.packages = b''
