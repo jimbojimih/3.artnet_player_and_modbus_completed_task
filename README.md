@@ -4,6 +4,7 @@ Completed task of sending ArtNet packets to DMX converters and transmitting data
 The data in the "Test_Color.ani" file is a sequence of bytes that has been converted into individual packets for sending.
 Three servers were deployed to test the program.
 "mtcpServerEmulator" is used to emulate the relay module, "test_artnet_servers" is used to emulate DMX converters.
+
 To run use artnet_player_and_modbus.py
 
 Тестовое задание на Python.
