@@ -60,7 +60,7 @@ class Packages():
 
 class Sender():
     
-    def __init__(self, bytes_string, modbus_broadcast, *artnet_list):
+    def __init__(self, bytes_string, modbus_broadcast, artnet_list):
         self.bytes_string = bytes_string
         self.modbus_broadcast = modbus_broadcast
         self.artnet_list = artnet_list  
@@ -116,10 +116,12 @@ if __name__ == '__main__':
     
     art_1 = ArtnetBroadcast("192.168.0.1", 6454)
     art_other = ArtnetBroadcast("192.168.0.2", 6454)
-    art_net_list = [art_1, art_other]
+    art_net_list = []
+    art_net_list.append(art_1)
+    art_net_list.append(art_other)
     for art_net in art_net_list:
         art_net.connect()
         
-    sender = Sender(bytes_string, modbus_broadcast, *art_net_list)
+    sender = Sender(bytes_string, modbus_broadcast, art_net_list)
     sender.send_type_1(0.25, 5, 5)
 
