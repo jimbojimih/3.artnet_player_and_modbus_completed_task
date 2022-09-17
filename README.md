@@ -10,3 +10,5 @@ Three servers were deployed to test the program.
 Данные в файле "Test_Color.ani" представляют собой последовательность байтов, которые были преобразованы в отдельные пакеты для отправки.
 Для тестовой проверки программы были развёрнуты три сервера. 
 Для эмуляции релейного модуля задействован "mtcpServerEmulator", для эмуляции DMX конвертеров задействован "test_artnet_servers".
+
+![Image text](https://github.com/jimbojimih/artnet_player_and_modbus/blob/main/task.jpg)
