@@ -12,4 +12,5 @@ To run use artnet_player_and_modbus.py
 Для тестовой проверки программы были развёрнуты три сервера. 
 Для эмуляции релейного модуля задействован "mtcpServerEmulator", для эмуляции DMX конвертеров задействован "test_artnet_servers".
 Для запуска используйте - artnet_player_and_modbus.py
+
 ![Image text](https://github.com/jimbojimih/artnet_player_and_modbus/blob/main/task.jpg)
